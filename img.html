@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search & Download</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .download-btn {
+            display: block;
+            margin-top: 5px;
+            padding: 5px;
+            text-decoration: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Search & Download Images</h2>
+    <input type="text" id="searchBox" placeholder="Search for images..." onkeypress="handleKeyPress(event)">
+    <button onclick="searchImages()">Search</button>
+    <div class="gallery" id="gallery"></div>
+
+    <script>
+        const API_KEY = "6FU7RdVXPWuvNqImV99LL8W9r5aRsmbxuG7UVjciWYPwVbGRCEDpSO2w";
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                searchImages();
+            }
+        }
+
+        async function searchImages() {
+            let query = document.getElementById("searchBox").value;
+            if (!query) return;
+            
+            let url = `https://api.pexels.com/v1/search?query=${query}&per_page=15`;
+            let gallery = document.getElementById("gallery");
+            gallery.innerHTML = "";
+            
+            let response = await fetch(url, {
+                headers: {
+                    Authorization: API_KEY
+                }
+            });
+            let data = await response.json();
+            
+            data.photos.forEach(photo => {
+                let imgContainer = document.createElement("div");
+                let img = document.createElement("img");
+                img.src = photo.src.medium;
+                let downloadLink = document.createElement("a");
+                downloadLink.href = photo.src.original;
+                downloadLink.target = "_blank";
+                downloadLink.innerText = "Download";
+                downloadLink.classList.add("download-btn");
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(downloadLink);
+                gallery.appendChild(imgContainer);
+            });
+        }
+    </script>
+</body>
+</html>
